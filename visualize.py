@@ -20,18 +20,15 @@ def stock(stock_code): #stock_code是股票代码，例子：上市 "600036.ss",
 def get_indicators(stock_code):
     # 创建dataframe
     # data = stock(stock_code)
-    data = pd.read_csv('akshare_dataframe/002475_20210709.csv')[-200:]
+    data = pd.read_csv('akshare_dataframe/300999_20210709.csv')#[-99:]  # TODO: 加个判断，如果本地有当日文件就访问本地文件，否则同步更新
+    # data = data[-100:]
 
     # 获取macd
     # data["macd"], data["macd_signal"], data["macd_hist"] = talib.MACD(data['Close'])
     data["macd"], data["macd_signal"], data["macd_hist"] = talib.MACD(data['收盘'])
 
-    # 获取10日均线和30日均线
-    data["ma7"] = talib.MA(data['收盘'], timeperiod=7)
-    data["ma8"] = talib.MA(data['收盘'], timeperiod=8)
-    data["ma10"] = talib.MA(data['收盘'], timeperiod=10)
-    data["ma25"] = talib.MA(data['收盘'], timeperiod=25)
-    data["ma30"] = talib.MA(data['收盘'], timeperiod=30)
+    data["ma5"] = talib.EMA(data['收盘'], timeperiod=5)
+    data["ma22"] = talib.EMA(data['收盘'], timeperiod=22)
 
     # 获取rsi
     data["rsi"] = talib.RSI(data['收盘'])
@@ -41,15 +38,15 @@ def get_indicators(stock_code):
 def plot_chart(data, title):
     fig = plt.figure()  # 创建绘图区，包含四个子图
     fig.set_size_inches((10, 8))
-    ax_candle = fig.add_axes((0, 0.72, 1, 0.32))  # 蜡烛图子图
-    ax_macd = fig.add_axes((0, 0.48, 1, 0.2), sharex=ax_candle)  # macd子图
+    ax_candle = fig.add_axes((0, 0.4, 1, 0.5))  # 蜡烛图子图  # left, bottom, width, height
+    ax_macd = fig.add_axes((0, 0, 1, 0.3), sharex=ax_candle)  # macd子图
     # ax_rsi = fig.add_axes((0, 0.24, 1, 0.2), sharex=ax_candle)  # rsi子图
     # ax_vol = fig.add_axes((0, 0, 1, 0.2), sharex=ax_candle)  # 成交量子图
 
     ohlc = []  # 存放行情数据，candlestick_ohlc需要传入固定格式的数据
     row_number = 0
     for date, row in data.iterrows():
-        date, highp, lowp, openp, closep = row[:5]
+        date, openp, closep, highp, lowp = row[:5]
         ohlc.append([row_number, openp, highp, lowp, closep])
         row_number = row_number + 1
 
@@ -64,13 +61,12 @@ def plot_chart(data, title):
         return date_tickers[int(x)]
 
     # 绘制蜡烛图
-    ax_candle.plot(data.index, data["ma7"], label="MA7")
-    ax_candle.plot(data.index, data["ma8"], label="MA8")
-    ax_candle.plot(data.index, data["ma25"], label="MA25")
+    ax_candle.plot(data.index, data["ma5"], label="MA5")
+    ax_candle.plot(data.index, data["ma22"], label="MA22")
     candlestick_ohlc(ax_candle, ohlc, colorup="g", colordown="r", width=0.8)
 
     ax_candle.xaxis.set_major_formatter(ticker.FuncFormatter(format_date))
-    ax_candle.xaxis.set_major_locator(ticker.MultipleLocator(6))  # 设置间隔为6个交易日
+    ax_candle.xaxis.set_major_locator(ticker.MultipleLocator(20))  # 设置X轴标记、网格间隔
     ax_candle.grid(True)
     ax_candle.set_title(title, fontsize=20)
     ax_candle.legend()
@@ -98,11 +94,12 @@ def plot_chart(data, title):
     plt.show()
 
 def industry(dict):
-    for key, value in dict.items():
-        # d.iteritems: an iterator over the (key, value) items
-        stock_info = get_indicators(key)
-        plot_chart(stock_info, value)
-
+    # for key, value in dict.items():
+    #     d.iteritems: an iterator over the (key, value) items
+        # stock_info = get_indicators(key)
+        # plot_chart(stock_info, value)
+    stock_info = get_indicators(233)
+    plot_chart(stock_info, 'lxjm')
 
 if __name__ == '__main__':
     industry(stock_list)

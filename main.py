@@ -22,9 +22,9 @@ def macd(arr):
            + (16 / 17 * expma(26, arr))
 
 if __name__ == '__main__':
-    for _, sid in stock_list.items():
-        df = ak.stock_zh_a_hist('002475', adjust='qfq')
-        df.to_csv(f"{df_path}/{sid}_{str(datetime.date.today()).replace('-', '')}.csv", index=False)
+    for sid, _ in stock_list.items():
+        df = ak.stock_zh_a_hist(sid[:-3], adjust='qfq')
+        df.to_csv(f"{df_path}/{sid[:-3]}_{str(datetime.date.today()).replace('-', '')}.csv", index=False)
 
     # df = pd.read_csv('002475_20210709.csv')['收盘']
     # day_closing_prices = np.array(df)[::-1]
