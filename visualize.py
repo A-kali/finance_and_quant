@@ -28,7 +28,7 @@ def plot_chart(data, title):
     # 绘制蜡烛图
     ax_candle.plot(data.index, data["ma5"], label="MA5")
     ax_candle.plot(data.index, data["ma22"], label="MA22")
-    candlestick_ohlc(ax_candle, ohlc, colorup="g", colordown="r", width=0.8)
+    candlestick_ohlc(ax_candle, ohlc, colorup="r", colordown="g", width=0.8)
 
     ax_candle.xaxis.set_major_formatter(ticker.FuncFormatter(format_date))
     ax_candle.xaxis.set_major_locator(ticker.MultipleLocator(20))  # 设置X轴标记、网格间隔

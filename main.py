@@ -3,11 +3,12 @@ import pytz
 from datetime import datetime, timedelta
 import talib
 import pandas as pd
-import datetime
 from chinese_calendar import is_workday
 import akshare as ak
 import warnings
+
 from stock_list import stock_list
+from visualize import plot_chart
 
 save_path = 'akshare_dataframe'
 
@@ -24,21 +25,21 @@ def get_stock(stock_code, data_num):
     str_date = now.strftime('%Y%m%d')
 
     if not os.path.exists(f'{save_path}/{stock_code}_{str_date}.csv'):
-        data = ak.stock_zh_a_hist(stock_code[:-3], adjust='qfq')
+        data = ak.stock_zh_a_hist(stock_code, adjust='qfq')
         os.remove(f'{save_path}/{stock_code}*.csv')
         data.to_csv(f'{save_path}/{stock_code}_{str_date}.csv', index=False)
     else:
-        data = pd.read_csv(f'{save_path}/{stock_code}_{str_date}.csv', index_col='日期')
+        data = pd.read_csv(f'{save_path}/{stock_code}_{str_date}.csv')
 
     if len(data) > data_num:
         data = data[-data_num:]
     else:
         warnings.warn('Insufficient data')
 
-    return data.reset_index()
+    return data.reset_index(drop=True)
 
 
-def get_indicators(stock_code, data_num):
+def get_base_indicators(stock_code, data_num):
     data = get_stock(stock_code, data_num)
     data["macd"], data["macd_signal"], data["macd_hist"] = talib.MACD(data['收盘'])
     data["ma5"] = talib.EMA(data['收盘'], timeperiod=5)
@@ -48,5 +49,7 @@ def get_indicators(stock_code, data_num):
 
 
 if __name__ == '__main__':
-    for sid, _ in stock_list.items():
-        pass
+    for sid, sname in stock_list.items():
+        data = get_base_indicators(sid[:-3], 500)
+        # data = data.iloc[::5].reset_index(drop=True)  # TODO: 计算周指标
+        plot_chart(data, 'test')
