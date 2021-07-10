@@ -44,7 +44,6 @@ def get_indicators(stock_code, data_num):
         data = data.reset_index()
 
     # 获取macd
-    # data["macd"], data["macd_signal"], data["macd_hist"] = talib.MACD(data['Close'])
     data["macd"], data["macd_signal"], data["macd_hist"] = talib.MACD(data['收盘'])
 
     data["ma5"] = talib.EMA(data['收盘'], timeperiod=5)
