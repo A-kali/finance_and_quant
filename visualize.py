@@ -1,3 +1,4 @@
+import os, shutil
 import pandas as pd
 import pandas_datareader as web
 from datetime import datetime, timedelta
@@ -5,8 +6,12 @@ import talib
 import matplotlib.pyplot as plt
 from mplfinance.original_flavor import candlestick_ohlc
 import matplotlib.ticker as ticker
+from chinese_calendar import is_workday
+import akshare as ak
 
 from stock_list import stock_list
+
+save_path = 'akshare_dataframe'
 
 def stock(stock_code): #stock_code是股票代码，例子：上市 "600036.ss", 深市 "000001.sz"
     start_date = "2021-1-01"  #起始日期
@@ -17,11 +22,26 @@ def stock(stock_code): #stock_code是股票代码，例子：上市 "600036.ss",
     return stock_info
 
 
-def get_indicators(stock_code):
-    # 创建dataframe
-    # data = stock(stock_code)
-    data = pd.read_csv('akshare_dataframe/300999_20210709.csv')#[-99:]  # TODO: 加个判断，如果本地有当日文件就访问本地文件，否则同步更新
-    # data = data[-100:]
+def get_indicators(stock_code, data_num):
+    # 寻找最后一个已结束的交易日
+    date = datetime.date(datetime.now())
+    while not is_workday(date):
+        date -= timedelta(days=1)
+    str_date = datetime.strftime(date, '%Y%m%d') # TODO: 判断是否在三点钟以后
+
+    if not os.path.exists(f'{save_path}/{stock_code}_{str_date}.csv'):
+        data = ak.stock_zh_a_hist(stock_code[:-3], adjust='qfq')
+        os.remove(f'{save_path}/{stock_code}*.csv')
+        data.to_csv(f'{save_path}/{stock_code}_{str_date}.csv', index=False)
+        print(data)  # TODO: 格式对齐
+        exit()
+    else:
+        data = pd.read_csv(f'{save_path}/{stock_code}_{str_date}.csv', index_col='日期')
+        if len(data) > data_num:
+            data = data[-data_num:]
+        else:
+            print('Insufficient data')
+        data = data.reset_index()
 
     # 获取macd
     # data["macd"], data["macd_signal"], data["macd_hist"] = talib.MACD(data['Close'])
@@ -37,11 +57,11 @@ def get_indicators(stock_code):
 
 def plot_chart(data, title):
     fig = plt.figure()  # 创建绘图区，包含四个子图
-    fig.set_size_inches((10, 8))
-    ax_candle = fig.add_axes((0, 0.4, 1, 0.5))  # 蜡烛图子图  # left, bottom, width, height
-    ax_macd = fig.add_axes((0, 0, 1, 0.3), sharex=ax_candle)  # macd子图
-    # ax_rsi = fig.add_axes((0, 0.24, 1, 0.2), sharex=ax_candle)  # rsi子图
-    # ax_vol = fig.add_axes((0, 0, 1, 0.2), sharex=ax_candle)  # 成交量子图
+    fig.set_size_inches((15, 12))
+    ax_candle = fig.add_axes((0, 0.72, 1, 0.32))  # 蜡烛图子图
+    ax_macd = fig.add_axes((0, 0.48, 1, 0.2), sharex=ax_candle)  # macd子图
+    ax_rsi = fig.add_axes((0, 0.24, 1, 0.2), sharex=ax_candle)  # rsi子图
+    ax_vol = fig.add_axes((0, 0, 1, 0.2), sharex=ax_candle)  # 成交量子图
 
     ohlc = []  # 存放行情数据，candlestick_ohlc需要传入固定格式的数据
     row_number = 0
@@ -53,9 +73,6 @@ def plot_chart(data, title):
     date_tickers = data['日期'].values  # 获取Date数据
 
     def format_date(x, pos=None):
-        # 由于前面股票数据在 date 这个位置传入的都是int
-        # 因此 x=0,1,2,...
-        # date_tickers 是所有日期的字符串形式列表
         if x < 0 or x > len(date_tickers) - 1:
             return ''
         return date_tickers[int(x)]
@@ -78,17 +95,17 @@ def plot_chart(data, title):
     ax_macd.set_title('MACD')
     ax_macd.legend()
 
-    # # 绘制RSI
-    # ax_rsi.set_ylabel("(%)")
-    # ax_rsi.plot(data.index, [70] * len(data.index), label="overbought")
-    # ax_rsi.plot(data.index, [30] * len(data.index), label="oversold")
-    # ax_rsi.plot(data.index, data["rsi"], label="rsi")
-    # ax_rsi.set_title('KDJ')
-    # ax_rsi.legend()
+    # 绘制RSI
+    ax_rsi.set_ylabel("(%)")
+    ax_rsi.plot(data.index, [70] * len(data.index), label="overbought")
+    ax_rsi.plot(data.index, [30] * len(data.index), label="oversold")
+    ax_rsi.plot(data.index, data["rsi"], label="rsi")
+    ax_rsi.set_title('KDJ')
+    ax_rsi.legend()
 
     # 绘制成交量
-    # ax_vol.bar(data.index, data["Volume"] / 1000000)
-    # ax_vol.set_ylabel("(Million)")
+    ax_vol.bar(data.index, data["成交量"] / 1000000)
+    ax_vol.set_ylabel("(Million)")
 
     # fig.savefig("/Users/answer/Desktop/investment/photos/" + title + ".png", bbox_inches="tight")
     plt.show()
