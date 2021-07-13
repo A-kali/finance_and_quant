@@ -6,3 +6,5 @@ stock_list = {
     '300750.sz': '宁德时代',
     '300999.sz': '金龙鱼',
 }
+
+columns = {'日期': 'date', '开盘': 'open', '收盘': 'close', '最高': 'high', '最低': 'low', '成交量': 'volume'}

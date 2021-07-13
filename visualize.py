@@ -18,7 +18,7 @@ def plot_chart(data, title):
         ohlc.append([row_number, openp, highp, lowp, closep])
         row_number = row_number + 1
 
-    date_tickers = data['日期'].values  # 获取Date数据
+    date_tickers = data['date'].values  # 获取Date数据
 
     def format_date(x, pos = None):
         if x < 0 or x > len(date_tickers) - 1:
@@ -52,7 +52,7 @@ def plot_chart(data, title):
     ax_rsi.legend()
 
     # 绘制成交量
-    ax_vol.bar(data.index, data["成交量"] / 1000000)
+    ax_vol.bar(data.index, data["volume"] / 1000000)
     ax_vol.set_ylabel("(Million)")
 
     # fig.savefig("/Users/answer/Desktop/investment/photos/" + title + ".png", bbox_inches="tight")
