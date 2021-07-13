@@ -30,7 +30,7 @@ def get_stock(stock_code, data_num):
         data.rename(columns=english_columns, inplace=True)
         for f in glob.glob(f'{save_path}/{stock_code}*.csv'):
             os.remove(f)
-            print(f'update: {f} -> {stock_code}*.csv')
+            print(f'update: {stock_code}_{str_date}.csv')
         data.to_csv(f'{save_path}/{stock_code}_{str_date}.csv', index=False)
     else:
         data = pd.read_csv(f'{save_path}/{stock_code}_{str_date}.csv')
