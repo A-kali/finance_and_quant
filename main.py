@@ -10,7 +10,7 @@ import warnings
 
 from stock_list import stock_list, columns as english_columns
 from visualize import plot_chart
-from utils import get_period_indicators
+from utils import period_data, pure_period_data
 
 save_path = 'akshare_dataframe'
 
@@ -44,8 +44,7 @@ def get_stock(stock_code, data_num) -> pd.DataFrame:
     return data.reset_index(drop=True)
 
 
-def get_base_indicators(stock_code, data_num):
-    data = get_stock(stock_code, data_num)
+def get_base_indicators(data):
     data["macd"], data["macd_signal"], data["macd_hist"] = talib.MACD(data['close'])
     data["ma5"] = talib.EMA(data['close'], timeperiod=5)
     data["ma22"] = talib.EMA(data['close'], timeperiod=22)
@@ -55,11 +54,11 @@ def get_base_indicators(stock_code, data_num):
 
 if __name__ == '__main__':
     for sid, sname in stock_list.items():
-        data = get_base_indicators(sid[:-3], 500)
-        # data = data.iloc[::5].reset_index(drop=True)  # TODO: 计算周指标
-        data_week1 = get_period_indicators(data.copy(), 'W')
-        data_week2 = get_period_indicators(data.copy(), '7D')
-        print(data_week1)
-        print(data_week2)
-        break
-        # plot_chart(data, 'test')
+        data = get_stock(sid[:-3], 500)
+        data_week1 = period_data(data, 'W')
+        data_week2 = pure_period_data(data, 'W')
+        # data_week = get_base_indicators(data_week)
+        # plot_chart(data_week, sid)
+
+# TODO: 修复日期显示的bug
+# TODO: 修复period_data数据无法计算指标的bug

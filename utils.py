@@ -1,9 +1,9 @@
 import pandas as pd
-import numpy as np
-# TODO: 看看pd resample ohlc是什么
 
-def get_period_indicators(data: pd.DataFrame, period):
-    '''
+
+def period_data(data: pd.DataFrame, period: str) -> pd.DataFrame:
+    """
+    计算周期指标
     :param data: stock DataFrame
     :param period:
         'W': 以周为周期，每个周期为每周日到周六。
@@ -12,10 +12,11 @@ def get_period_indicators(data: pd.DataFrame, period):
         'D': 以日为周期。
         'M': 以月为周期。
         'Q': 以季为周期。
-    :return:
-    '''
+    :return: 周期性的数据
+    """
+    data = data.copy()  # 避免在函数内部修改dataframe，影响函数外的数据
     data["date"] = pd.to_datetime(data["date"])
-    data.set_index('date',inplace=True)
+    data.set_index('date', inplace=True)
 
     period_data = data.resample(period).last()
     period_data['open'] = data['open'].resample(period).first()
@@ -23,33 +24,28 @@ def get_period_indicators(data: pd.DataFrame, period):
     period_data['low'] = data['low'].resample(period).min()
     period_data['volume'] = data['volume'].resample(period).sum()
 
-    #股票在有些周一天都没有交易，将这些周去除
+    # 股票在有些周一天都没有交易，将这些周去除
     period_data = period_data[period_data['volume'].notnull()]
     period_data.reset_index(inplace=True)
-
-    data = np.array(period_data) #先将数据框转换为数组
-    data_list = data.tolist()  #其次转换为列表
-    for i in data_list:
-        i[0]=str(i[0]).split(" ")[0]
-    return data_list
+    return period_data
 
 
-def get_period_indicators2(data, period):
+def pure_period_data(data: pd.DataFrame, period: str) -> pd.DataFrame:
+
+    if period == 'M':
+        period_days = 22
+    elif period == 'W':
+        period_days = 5
+    else:
+        raise ValueError("period should be 'M' or 'W'")
+
+    data = data.copy()
     data["date"] = pd.to_datetime(data["date"])
-    data.set_index('date',inplace=True)
 
-    period_data = data.resample(period).last()
-    period_data['open'] = data['open'].resample(period).first()
-    period_data['high'] = data['high'].resample(period).max()
-    period_data['low'] = data['low'].resample(period).min()
-    period_data['volume'] = data['volume'].resample(period).sum()
-
-    #股票在有些周一天都没有交易，将这些周去除
-    period_data = period_data[period_data['volume'].notnull()]
-    period_data.reset_index(inplace=True)
-
-    data = np.array(period_data) #先将数据框转换为数组
-    data_list = data.tolist()  #其次转换为列表
-    for i in data_list:
-        i[0]=str(i[0]).split(" ")[0]
-    return data_list
+    period_data = data.iloc[-1::-period_days].reset_index(drop=True)
+    period_data['open'] = data['open'].iloc[-period_days:0:-period_days].reset_index(drop=True)
+    period_data = period_data[::-1].reset_index(drop=True)
+    period_data['high'] = data['high'].groupby(lambda x:x//5).max()
+    period_data['low'] = data['low'].groupby(lambda x:x//5).min()
+    period_data['volume'] = data['volume'].groupby(lambda x:x//5).sum()
+    return period_data
