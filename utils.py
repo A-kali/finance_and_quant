@@ -1,8 +1,19 @@
 import pandas as pd
 import numpy as np
+# TODO: 看看pd resample ohlc是什么
 
-
-def get_period_indicators(data, period):
+def get_period_indicators(data: pd.DataFrame, period):
+    '''
+    :param data: stock DataFrame
+    :param period:
+        'W': 以周为周期，每个周期为每周日到周六。
+             与'7D'的差别在于'7D'是从当日开始往回计算，不用顾及周的关系。
+             值得注意的是，这些周期都是严格按照日期计算的（而不是按照数据行数），就算数据中有日期空缺（周末、节假日）也会计入。
+        'D': 以日为周期。
+        'M': 以月为周期。
+        'Q': 以季为周期。
+    :return:
+    '''
     data["date"] = pd.to_datetime(data["date"])
     data.set_index('date',inplace=True)
 
@@ -20,7 +31,7 @@ def get_period_indicators(data, period):
     data_list = data.tolist()  #其次转换为列表
     for i in data_list:
         i[0]=str(i[0]).split(" ")[0]
-    return data_list  # TODO: 验证W和7D/5D是不是一样的
+    return data_list
 
 
 def get_period_indicators2(data, period):

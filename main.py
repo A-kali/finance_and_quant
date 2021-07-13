@@ -10,11 +10,12 @@ import warnings
 
 from stock_list import stock_list, columns as english_columns
 from visualize import plot_chart
+from utils import get_period_indicators
 
 save_path = 'akshare_dataframe'
 
 
-def get_stock(stock_code, data_num):
+def get_stock(stock_code, data_num) -> pd.DataFrame:
     # 寻找最后一个已结束的交易日
     now = datetime.now(pytz.timezone('Asia/Shanghai'))
     if is_workday(now):
@@ -56,5 +57,9 @@ if __name__ == '__main__':
     for sid, sname in stock_list.items():
         data = get_base_indicators(sid[:-3], 500)
         # data = data.iloc[::5].reset_index(drop=True)  # TODO: 计算周指标
-        # data_week =
+        data_week1 = get_period_indicators(data.copy(), 'W')
+        data_week2 = get_period_indicators(data.copy(), '7D')
+        print(data_week1)
+        print(data_week2)
+        break
         # plot_chart(data, 'test')
