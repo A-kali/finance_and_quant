@@ -15,7 +15,7 @@ def period_data(data: pd.DataFrame, period: str) -> pd.DataFrame:
     :return: 周期性的数据
     """
     data = data.copy()  # 避免在函数内部修改dataframe，影响函数外的数据
-    data["date"] = pd.to_datetime(data["date"])
+    data["date"] = pd.to_datetime(data["date"], format='%Y-%m-%d')
     data.set_index('date', inplace=True)
 
     period_data = data.resample(period).last()
@@ -25,8 +25,11 @@ def period_data(data: pd.DataFrame, period: str) -> pd.DataFrame:
     period_data['volume'] = data['volume'].resample(period).sum()
 
     # 股票在有些周一天都没有交易，将这些周去除
-    period_data = period_data[period_data['volume'].notnull()]
+    period_data = period_data[period_data['volume'] != 0]
     period_data.reset_index(inplace=True)
+
+    period_data["date"] = period_data["date"].map(lambda x: str(x)[:10])  # 将时间对象转为标准格式的字符串，优化显示效果
+
     return period_data
 
 
@@ -40,7 +43,7 @@ def pure_period_data(data: pd.DataFrame, period: str) -> pd.DataFrame:
         raise ValueError("period should be 'M' or 'W'")
 
     data = data.copy()
-    data["date"] = data["date"].map(str)
+    # data["date"] = pd.to_datetime(data["date"])
 
     period_data = data.iloc[-1::-period_days].reset_index(drop=True)
     period_data['open'] = data['open'].iloc[-period_days:0:-period_days].reset_index(drop=True)
