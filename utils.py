@@ -40,7 +40,7 @@ def pure_period_data(data: pd.DataFrame, period: str) -> pd.DataFrame:
         raise ValueError("period should be 'M' or 'W'")
 
     data = data.copy()
-    data["date"] = pd.to_datetime(data["date"])
+    data["date"] = data["date"].map(str)
 
     period_data = data.iloc[-1::-period_days].reset_index(drop=True)
     period_data['open'] = data['open'].iloc[-period_days:0:-period_days].reset_index(drop=True)

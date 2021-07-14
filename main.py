@@ -57,8 +57,9 @@ if __name__ == '__main__':
         data = get_stock(sid[:-3], 500)
         data_week1 = period_data(data, 'W')
         data_week2 = pure_period_data(data, 'W')
-        data_week = get_base_indicators(data_week1)
-        plot_chart(data_week1, sid)
+        data_week = get_base_indicators(data_week2)
+        plot_chart(data_week2, sid)
+
 
 # TODO: 修复日期显示的bug
 # TODO: 修复period_data数据无法计算指标的bug

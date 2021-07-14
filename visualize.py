@@ -18,7 +18,7 @@ def plot_chart(data, title):
         ohlc.append([row_number, openp, highp, lowp, closep])
         row_number = row_number + 1
 
-    data['date'] = data['date'].strftime('%Y-%m-%d')
+    # data['date'] = data['date'].strftime('%Y-%m-%d')
     date_tickers = data['date'].values  # 获取Date数据
 
     def format_date(x, pos = None):
