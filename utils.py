@@ -52,3 +52,14 @@ def pure_period_data(data: pd.DataFrame, period: str) -> pd.DataFrame:
     period_data['low'] = data['low'].groupby(lambda x:x//5).min()
     period_data['volume'] = data['volume'].groupby(lambda x:x//5).sum()
     return period_data
+
+
+def is_macd_rising(data):
+    return data['macd'].iloc[-1] > data['macd'].iloc[-2]
+
+
+def ene(data):
+    pass
+
+def avg_break_down(data):
+    pass

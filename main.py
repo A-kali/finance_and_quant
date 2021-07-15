@@ -62,4 +62,5 @@ if __name__ == '__main__':
         # plot_chart(data_week1, sid)
 
 
-# TODO: 修复period_data数据无法计算指标的bug
+# TODO: 判断周MACD和EMA趋势
+# TODO: 计算ENE
