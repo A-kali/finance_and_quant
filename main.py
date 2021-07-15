@@ -10,7 +10,7 @@ import warnings
 
 from stock_list import stock_list, columns as english_columns
 from visualize import plot_chart
-from utils import period_data, pure_period_data
+from utils import period_data, pure_period_data, avg_break_down
 
 save_path = 'akshare_dataframe'
 
@@ -54,13 +54,15 @@ def get_base_indicators(data):
 
 if __name__ == '__main__':
     for sid, sname in stock_list.items():
-        data = get_stock(sid[:-3], 500)
-        data_week1 = period_data(data, 'W')
-        data_week2 = pure_period_data(data, 'W')
-        data_week1 = get_base_indicators(data_week1)
-        data_week2 = get_base_indicators(data_week2)
+        data = get_stock(sid[:-3], 300)
+        # data_week1 = period_data(data, 'W')
+        # data_week = pure_period_data(data, 'W')
+        # data_week1 = get_base_indicators(data_week1)
+        data = get_base_indicators(data)
         # plot_chart(data_week1, sid)
 
+        print(avg_break_down(data))
 
-# TODO: 判断周MACD和EMA趋势
+
+# TODO: 判断EMA趋势
 # TODO: 计算ENE

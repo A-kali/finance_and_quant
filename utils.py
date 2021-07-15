@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 
 def period_data(data: pd.DataFrame, period: str) -> pd.DataFrame:
@@ -61,5 +62,10 @@ def is_macd_rising(data):
 def ene(data):
     pass
 
-def avg_break_down(data):
-    pass
+# TODO: 智能选取系数
+def avg_break_down(data, coef=2):
+    data = data.iloc[-22:]
+    break_down = data['ma22'] - data['low']
+    avg_break_down = break_down[break_down > 0].mean() * coef
+    return  0 if np.isnan(avg_break_down) else avg_break_down
+
