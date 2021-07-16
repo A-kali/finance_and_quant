@@ -1,31 +1,19 @@
 import os
 import glob
-import pytz
-from datetime import datetime, timedelta
 import talib
 import pandas as pd
-from chinese_calendar import is_workday
 import akshare as ak
 import warnings
 
-from stock_list import stock_list, columns as english_columns
 from visualize import plot_chart
-from utils import period_data, pure_period_data, avg_break_down
+from utils import period_data, pure_period_data, avg_break_down, latest_trading_day
+from pool import english_columns, StockPool
 
 save_path = 'akshare_dataframe'
 
 
 def get_stock(stock_code, data_num) -> pd.DataFrame:
-    # 寻找最后一个已结束的交易日
-    now = datetime.now(pytz.timezone('Asia/Shanghai'))
-    if is_workday(now):
-        # 如果是交易日的下午三点之前，则使用前一天的数据
-        if now.hour < 15:
-            now -= timedelta(days=1)
-    while not is_workday(now):
-        now -= timedelta(days=1)
-    str_date = now.strftime('%Y%m%d')
-
+    str_date = latest_trading_day()
     if not os.path.exists(f'{save_path}/{stock_code}_{str_date}.csv'):
         data = ak.stock_zh_a_hist(stock_code, adjust='qfq')
         data.rename(columns=english_columns, inplace=True)
@@ -53,7 +41,8 @@ def get_base_indicators(data):
 
 
 if __name__ == '__main__':
-    for sid, sname in stock_list.items():
+    sp = StockPool()
+    for sid, sname in sp:
         data = get_stock(sid[:-3], 300)
         # data_week1 = period_data(data, 'W')
         # data_week = pure_period_data(data, 'W')

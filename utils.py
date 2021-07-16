@@ -1,5 +1,20 @@
 import pandas as pd
 import numpy as np
+from chinese_calendar import is_workday
+from datetime import datetime, timedelta
+import pytz
+
+
+def latest_trading_day():
+    # 寻找最后一个已结束的交易日
+    now = datetime.now(pytz.timezone('Asia/Shanghai'))
+    if is_workday(now):
+        # 如果是交易日的下午三点之前，则使用前一天的数据
+        if now.hour < 15:
+            now -= timedelta(days=1)
+    while not is_workday(now):
+        now -= timedelta(days=1)
+    return now.strftime('%Y%m%d')
 
 
 def period_data(data: pd.DataFrame, period: str) -> pd.DataFrame:

@@ -2,5 +2,20 @@
 /shelf/
 /workspace.xml
 
+*.csv
 /akshare_dataframe/
 tools.md
+/__pycache__/
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+modules.xml
+
+**/.idea
+**/*.iws
+**/*.iml
+**/*.ipr
+**/modules.xml
