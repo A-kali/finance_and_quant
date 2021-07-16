@@ -44,21 +44,25 @@ class AShare:
         str_date = latest_trading_day()
         f_name = f'{save_path}/ashares_{str_date}.csv'
         if not os.path.exists(f_name):
+            # 获取所有A股当前信息
             data = ak.stock_zh_a_spot_em()
             data.rename(columns=english_columns, inplace=True)
             for f in glob.glob(f'{save_path}/ashares_*.csv'):
                 os.remove(f)
             print(f_name)
-            data['code'].to_string()
             data.set_index('code', inplace=True)
             data.to_csv(f_name)
         else:
-            data = pd.read_csv(f_name, index_col='code')
-
+            data = pd.read_csv(f_name)
+            data.set_index('code', inplace=True)
+            data.index = data.index.astype('str')
         self.data = data
 
     def __getitem__(self, code):
-        return self.data.loc[code]
+        try:
+            return self.data.loc[code]
+        except:
+            exit()
 
 
 if __name__ == '__main__':
