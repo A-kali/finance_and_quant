@@ -67,5 +67,5 @@ def avg_break_down(data, coef=2):
     data = data.iloc[-22:]
     break_down = data['ma22'] - data['low']
     avg_break_down = break_down[break_down > 0].mean() * coef
-    return  0 if np.isnan(avg_break_down) else avg_break_down
+    return 0 if np.isnan(avg_break_down) else avg_break_down
 

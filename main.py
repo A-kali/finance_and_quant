@@ -66,3 +66,4 @@ if __name__ == '__main__':
 
 # TODO: 判断EMA趋势
 # TODO: 计算ENE
+# TODO: 智能选取ENE参数
