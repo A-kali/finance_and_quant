@@ -71,4 +71,4 @@ class TripleScreen:
             if ss:
                 price = self._third_screen()
                 part = self.save_zone(price)
-                print(f'建议买点:{price}，建议仓位：{part}')
+                print(f'Suggested buying point: {price}, suggested part: {part}')
