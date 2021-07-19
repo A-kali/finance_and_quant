@@ -56,3 +56,8 @@ if __name__ == '__main__':
 # TODO: 判断EMA趋势
 # TODO: 计算ENE
 # TODO: 智能选取ENE参数
+
+# TODO: 回溯
+# TODO: 爬虫
+# TODO: 短信/邮件
+# TODO: 交互界面
