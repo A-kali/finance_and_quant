@@ -1,6 +1,7 @@
 import pandas as pd
-from utils import pure_period_data, ene, avg_break_down
+from utils import pure_period_data, ene, avg_break_down, strength_ind
 import talib
+
 
 class TripleScreen:
     """
@@ -13,6 +14,7 @@ class TripleScreen:
         self.data_w = pure_period_data(data, 'W')
         self.current_price = current_price
         self.total_net_worth = total_net_worth
+
     def _first_screen(self) -> int:
         """
         判断半年EMA趋势和周MACD趋势是否向上
@@ -31,6 +33,7 @@ class TripleScreen:
         else:                                       # 向下
             mark -= 1
         return mark
+
     def _second_screen(self, active=False):  # TODO: 判断active
         """
         策略A：
@@ -41,21 +44,30 @@ class TripleScreen:
         使用ENE，触及到上轨就减仓、清仓，触及到均线就加仓、建仓。周趋势反转则获利了结
         """
         if active:
-            pass
+            strength =  strength_ind(self.data)
+            if talib.EMA(strength, timeperiod=2) < 0:
+                return True
         else:
-            macd = talib.MACD(self.data['close'])[0]
-        return
-    def _third_screen(self, active=False) -> float:
+            macd = talib.MACD(self.data['close'])[0]  # TODO: MACD应该使用当日的还是前一日的？
+            if macd[-2] <= 0 and macd[-1] > 0:
+                return True
+        return False
+
+    def _third_screen(self, active=False, timeperiod=5) -> float:
         """
         判断进场、出场点位
         :param active:
         :return: price
         """
         if active:
-            pass  # 均线
+            close = self.data['close'].copy()
+            close.append(self.current_price)
+            ema = talib.EMA(close, timeperiod=timeperiod)  # TODO: 几日均线？
+            return ema[-1]
         else:
-            pass  # 前一日高点/低点
-        return float()
+            high = self.data.iloc[-1]['high']  # 前一日高点/低点
+            return high
+
     def save_zone(self, stock_price) -> float:
         """
         安全区法计算仓位
@@ -64,7 +76,8 @@ class TripleScreen:
         abd, ema22 = avg_break_down(self.data)
         save_part = (self.total_net_worth * 0.02) / (stock_price - ema22 + abd)
         return save_part
-    def choose(self):  # 暂时只考虑进场的情况，再考虑仓位和离场
+
+    def choose(self):  # TODO: 离场
         fs = self._first_screen()
         if fs == 2:
             ss = self._second_screen()
@@ -72,3 +85,8 @@ class TripleScreen:
                 price = self._third_screen()
                 part = self.save_zone(price)
                 print(f'Suggested buying point: {price}, suggested part: {part}')
+
+
+if __name__ == '__main__':
+    ts = TripleScreen()
+

@@ -21,6 +21,7 @@ class StockPool:
     save_name = 'stocks_pool.csv'
     def __init__(self):
         self.data = pd.read_csv(self.save_name)
+        # self.data['code'] = self.data['code'].astype('str')
 
     def add(self, code):
         ashare = AShare()

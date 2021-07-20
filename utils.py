@@ -85,3 +85,7 @@ def avg_break_down(data, coef=2):
     avg_break_down = break_down[break_down > 0].mean() * coef
     return 0 if np.isnan(avg_break_down) else avg_break_down
 
+
+def strength_ind(data):
+    strength = data.iloc[1:]['volume'] * (data.iloc[1:]['close'] - data.iloc[:-1]['close'])
+    return strength

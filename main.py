@@ -6,8 +6,9 @@ import akshare as ak
 import warnings
 
 from visualize import plot_chart
-from utils import period_data, pure_period_data, avg_break_down, latest_trading_day
+from utils import period_data, pure_period_data, latest_trading_day
 from pool import english_columns, StockPool
+from strategy import TripleScreen
 
 save_path = 'akshare_dataframe'
 
@@ -42,16 +43,15 @@ def get_base_indicators(data):
 
 if __name__ == '__main__':
     sp = StockPool()
-    for sid, sname in sp:
-        data = get_stock(sid[:-3], 300)
-        # data_week1 = period_data(data, 'W')
-        # data_week = pure_period_data(data, 'W')
-        # data_week1 = get_base_indicators(data_week1)
+    for i, (sid, sname) in sp:
+        data = get_stock(sid[:6], 300)
+        data_week = pure_period_data(data, 'W')
         data = get_base_indicators(data)
         # plot_chart(data_week1, sid)
 
-        print(avg_break_down(data))
-
+        cp = float()
+        tnw = float()
+        ts = TripleScreen(data, cp, tnw)
 
 # TODO: 判断EMA趋势
 # TODO: 计算ENE
