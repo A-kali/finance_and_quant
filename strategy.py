@@ -1,3 +1,4 @@
+import math
 import numpy as np
 import pandas as pd
 from utils import pure_period_data, ene, avg_break_down, strength_ind
@@ -13,7 +14,7 @@ class TripleScreen:
     def __init__(self, data: pd.DataFrame, current_price, total_net_worth):
         self.data = data
         self.data_w = pure_period_data(data, 'W')
-        self.current_price = current_price if current_price else data['close'].iloc[-1]
+        self.current_price = current_price
         self.total_net_worth = total_net_worth
 
     def _first_screen(self) -> int:
@@ -62,8 +63,11 @@ class TripleScreen:
         """
         if active:
             close = self.data['close'].values
-            np.append(close, self.current_price)
+            if not math.isnan(self.current_price):
+                close = np.append(close, self.current_price)
+            print(close[-5:])
             ema = talib.EMA(close, timeperiod=timeperiod)  # TODO: 几日均线？
+            print(ema[-5:])
             return ema[-1]
         else:
             high = self.data.iloc[-1]['high']  # 前一日高点/低点

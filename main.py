@@ -45,7 +45,7 @@ if __name__ == '__main__':
     sp = StockPool()
     # sp.add('000516')
     for i, row in sp:
-        data = get_stock(row['code'][:6], 300)
+        data = get_stock(row['code'][:6], 200)  # 至少需要180天以上（26×7+假期）
         data_week = pure_period_data(data, 'W')
         data = get_base_indicators(data)
         # plot_chart(data_week1, sid)
