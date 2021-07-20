@@ -43,13 +43,17 @@ def get_base_indicators(data):
 
 if __name__ == '__main__':
     sp = StockPool()
+    sp.add('000516')
+    exit()
     for i, row in sp:
         data = get_stock(row['code'][:6], 300)
         data_week = pure_period_data(data, 'W')
         data = get_base_indicators(data)
         # plot_chart(data_week1, sid)
 
+        print(row['code'], row['name'], row['price'])
         ts = TripleScreen(data, row['price'], 230000)
+        ts.choose()
 
 
 # TODO: 判断EMA趋势

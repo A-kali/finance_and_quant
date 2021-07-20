@@ -74,18 +74,17 @@ def is_macd_rising(data):
     return data['macd'].iloc[-1] > data['macd'].iloc[-2]
 
 
-def ene(data):
+def ene(data):  # 几日均线作为中线？
     pass
 
 # TODO: 智能选取系数
 def avg_break_down(data, coef=2):
     data = data.iloc[-22:]
     break_down = data['ma22'] - data['low']
-    print(break_down)
     avg_break_down = break_down[break_down > 0].mean() * coef
-    return 0 if np.isnan(avg_break_down) else avg_break_down
+    return 0 if np.isnan(avg_break_down) else avg_break_down, data['ma22'].iloc[-1]
 
 
 def strength_ind(data):
-    strength = data.iloc[1:]['volume'] * (data.iloc[1:]['close'] - data.iloc[:-1]['close'])
+    strength = data.iloc[1:]['volume'].values * (data.iloc[1:]['close'].values - data.iloc[:-1]['close'].values)
     return strength

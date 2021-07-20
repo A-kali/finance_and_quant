@@ -45,11 +45,11 @@ class TripleScreen:
         """
         if active:
             strength =  strength_ind(self.data)
-            if talib.EMA(strength, timeperiod=2) < 0:
+            if talib.EMA(strength, timeperiod=2)[-1] < 0:
                 return True
         else:
             macd = talib.MACD(self.data['close'])[0]  # TODO: MACD应该使用当日的还是前一日的？
-            if macd[-2] <= 0 and macd[-1] > 0:
+            if macd.iloc[-2] <= 0 and macd.iloc[-1] > 0:
                 return True
         return False
 
@@ -68,25 +68,30 @@ class TripleScreen:
             high = self.data.iloc[-1]['high']  # 前一日高点/低点
             return high
 
-    def save_zone(self, stock_price) -> float:
+    def save_zone(self, stock_price):
         """
         安全区法计算仓位
         :return:
         """
         abd, ema22 = avg_break_down(self.data)
-        save_part = (self.total_net_worth * 0.02) / (stock_price - ema22 + abd)
-        return save_part
+        save_part = (self.total_net_worth * 0.02) / (stock_price - ema22 + abd) * stock_price
+        save_ratio = save_part / self.total_net_worth
+        board_lot = save_part // (stock_price * 100)
+        return save_part, save_ratio, board_lot
 
     def choose(self):  # TODO: 离场
         fs = self._first_screen()
         if fs == 2:
-            ss = self._second_screen()
+            ss = self._second_screen(active=True)
             if ss:
                 price = self._third_screen()
-                part = self.save_zone(price)
-                print(f'Suggested buying point: {price}, suggested part: {part}')
+                part, ratio, board_lot = self.save_zone(price)
+                # return True
+                print(f'Suggested buying point: {price},'
+                      f' suggested part: {round(part)}')
+                print(ratio, board_lot, price)
 
 
-if __name__ == '__main__':
-    ts = TripleScreen()
+# if __name__ == '__main__':
+#     ts = TripleScreen()
 
