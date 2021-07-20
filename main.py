@@ -43,15 +43,14 @@ def get_base_indicators(data):
 
 if __name__ == '__main__':
     sp = StockPool()
-    for i, (sid, sname) in sp:
-        data = get_stock(sid[:6], 300)
+    for i, row in sp:
+        data = get_stock(row['code'][:6], 300)
         data_week = pure_period_data(data, 'W')
         data = get_base_indicators(data)
         # plot_chart(data_week1, sid)
 
-        cp = float()
-        tnw = float()
-        ts = TripleScreen(data, cp, tnw)
+        ts = TripleScreen(data, row['price'], 230000)
+
 
 # TODO: 判断EMA趋势
 # TODO: 计算ENE
