@@ -43,8 +43,7 @@ def get_base_indicators(data):
 
 if __name__ == '__main__':
     sp = StockPool()
-    sp.add('000516')
-    exit()
+    # sp.add('000516')
     for i, row in sp:
         data = get_stock(row['code'][:6], 300)
         data_week = pure_period_data(data, 'W')

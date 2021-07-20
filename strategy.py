@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 from utils import pure_period_data, ene, avg_break_down, strength_ind
 import talib
@@ -12,7 +13,7 @@ class TripleScreen:
     def __init__(self, data: pd.DataFrame, current_price, total_net_worth):
         self.data = data
         self.data_w = pure_period_data(data, 'W')
-        self.current_price = current_price
+        self.current_price = current_price if current_price else data['close'].iloc[-1]
         self.total_net_worth = total_net_worth
 
     def _first_screen(self) -> int:
@@ -60,8 +61,8 @@ class TripleScreen:
         :return: price
         """
         if active:
-            close = self.data['close'].copy()
-            close.append(self.current_price)
+            close = self.data['close'].values
+            np.append(close, self.current_price)
             ema = talib.EMA(close, timeperiod=timeperiod)  # TODO: 几日均线？
             return ema[-1]
         else:
@@ -84,12 +85,13 @@ class TripleScreen:
         if fs == 2:
             ss = self._second_screen(active=True)
             if ss:
-                price = self._third_screen()
+                price = self._third_screen(True)
                 part, ratio, board_lot = self.save_zone(price)
                 # return True
-                print(f'Suggested buying point: {price},'
+                print(f'Suggested buying point: {price:.2f},'
                       f' suggested part: {round(part)}')
-                print(ratio, board_lot, price)
+                print(ratio, board_lot)
+                return price, part, ratio, board_lot
 
 
 # if __name__ == '__main__':
