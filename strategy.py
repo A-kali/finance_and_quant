@@ -86,6 +86,7 @@ class TripleScreen:
 
     def choose(self):  # TODO: 离场
         fs = self._first_screen()
+        print(fs)
         if fs == 2:
             ss = self._second_screen(active=True)
             if ss:
