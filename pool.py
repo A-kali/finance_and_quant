@@ -48,7 +48,7 @@ class AShare:
         # f_name = f'{save_path}/ashares_{str_date}.csv'
         # if not os.path.exists(f_name):
         # 获取所有A股当前信息
-        if 1:  # debug
+        if 0:  # debug
             data = pd.read_csv('ashares_20210720.csv', dtype='object').set_index('code')
         else:
             data = ak.stock_zh_a_spot_em()
