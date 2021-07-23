@@ -65,9 +65,7 @@ class TripleScreen:
             close = self.data['close'].values
             if not math.isnan(self.current_price):
                 close = np.append(close, self.current_price)
-            print(close[-5:])
             ema = talib.EMA(close, timeperiod=timeperiod)  # TODO: 几日均线？
-            print(ema[-5:])
             return ema[-1]
         else:
             high = self.data.iloc[-1]['high']  # 前一日高点/低点

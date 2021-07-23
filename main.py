@@ -50,7 +50,7 @@ if __name__ == '__main__':
         data = get_base_indicators(data)
         # plot_chart(data_week1, sid)
 
-        print(row['code'], row['name'], row['price'])
+        print(row['code'], row['name'], row['price'], end=None)
         ts = TripleScreen(data, row['price'], 230000)
         ts.choose()
 

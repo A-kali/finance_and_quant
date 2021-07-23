@@ -21,9 +21,10 @@ english_columns = {
 class StockPool:
     save_name = 'stocks_pool.csv'
     def __init__(self):
-        self.stocks = pd.read_csv(self.save_name, dtype='object')
+        self.stocks = pd.read_csv(self.save_name, dtype='object').set_index('code')
         self.ashare = AShare()
-        self.stocks['price'] = self.ashare[self.ashare.data.index.isin(self.stocks['code'])]['price']
+        self.stocks['price'] = self.ashare[self.ashare.data.index.isin(self.stocks.index)]['price']
+        self.stocks.reset_index(inplace=True)
 
     def add(self, code):
         name = self.ashare[code[:6]]['name']
@@ -49,7 +50,7 @@ class AShare:
         # if not os.path.exists(f_name):
         # 获取所有A股当前信息
         if 0:  # debug
-            data = pd.read_csv('ashares_20210720.csv', dtype='object').set_index('code')
+            data = pd.read_csv('ashares_20210720.csv', dtype='object')
         else:
             data = ak.stock_zh_a_spot_em()
         data.rename(columns=english_columns, inplace=True)
@@ -61,7 +62,7 @@ class AShare:
         # else:
         #     data = pd.read_csv(f_name, dtype='object')
         #     data.set_index('code', inplace=True)
-        self.data = data
+        self.data = data.set_index('code')
 
     def __getitem__(self, code):
         return self.data.loc[code]
