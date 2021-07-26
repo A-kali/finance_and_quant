@@ -1,11 +1,15 @@
 import math
 import numpy as np
 import pandas as pd
-from utils import pure_period_data, ene, avg_break_down, strength_ind
+
 import talib
+import backtrader as bt
+
+from utils import pure_period_data, ene, avg_break_down, strength_ind
 
 
-class TripleScreen:
+
+class TripleScreen(bt.Strategy):
     """
     书名：Come Into My Trading RoomA Complete Guide to Trading
     中文名：《走进我的交易室》
@@ -16,6 +20,8 @@ class TripleScreen:
         self.data_w = pure_period_data(data, 'W')
         self.current_price = current_price
         self.total_net_worth = total_net_worth
+
+        self.order = None
 
     def _first_screen(self) -> int:
         """
@@ -95,6 +101,23 @@ class TripleScreen:
                       f' suggested part: {round(part)}')
                 print(ratio, board_lot)
                 return price, part, ratio, board_lot
+
+    def next(self):
+        if self.order:
+            return
+
+        fs = self._first_screen()
+        if fs == 2:
+            ss = self._second_screen(active=True)
+            if ss:
+                price = self._third_screen(True)
+                part, ratio, board_lot = self.save_zone(price)
+        elif fs == 1:
+            pass
+        elif fs == 0:
+            pass
+        else:
+            pass
 
 
 # if __name__ == '__main__':
