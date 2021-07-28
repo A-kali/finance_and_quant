@@ -8,8 +8,8 @@ import backtrader as bt
 from utils import pure_period_data, ene, avg_break_down, strength_ind
 
 
-
-class TripleScreen(bt.Strategy):
+# bt.Strategy
+class TripleScreen():
     """
     书名：Come Into My Trading RoomA Complete Guide to Trading
     中文名：《走进我的交易室》
@@ -88,7 +88,7 @@ class TripleScreen(bt.Strategy):
         board_lot = save_part // (stock_price * 100)
         return save_part, save_ratio, board_lot
 
-    def choose(self):  # TODO: 离场
+    def choose(self):  # TODO: 离场（获利离场和止损离场）
         fs = self._first_screen()
         print(fs)
         if fs == 2:
